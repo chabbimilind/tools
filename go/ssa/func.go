@@ -327,7 +327,7 @@ func (f *Function) finishBody() {
 	buildReferrers(f)
 
 	buildDomTree(f)
-	if f.Recover == nil {
+	if true || f.Recover == nil {
 		buildPostdomTree(f)
 	}
 

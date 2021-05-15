@@ -371,12 +371,6 @@ func dumpPDomTree(f *Function, root *BasicBlock) {
 //
 func buildPostdomTree(f *Function) {
 
-	// No idea how to build pdom-tree for a function with recover code.
-	// We just don't build
-	if f.Recover != nil {
-		// users of PDOM need to check this condition, else the results are bogus.
-		return
-	}
 	var dummyExit BasicBlock
 	dummyExit.Preds = exitBlocks(f)
 	root := &dummyExit
@@ -391,7 +385,6 @@ func buildPostdomTree(f *Function) {
 	for _, b := range f.Blocks {
 		b.Index++
 	}
-
 	defer func() {
 		// Decrease everybody's Index by 1
 		for _, b := range f.Blocks {
@@ -405,7 +398,6 @@ func buildPostdomTree(f *Function) {
 	var lt ltState
 
 	noPathToExit := map[*BasicBlock]struct{}{}
-
 	for {
 		// Clear any previous pdomInfo.
 		for _, b := range f.Blocks {
@@ -424,7 +416,6 @@ func buildPostdomTree(f *Function) {
 		}
 		// Step 1.  Number vertices by depth-first preorder on the reverse CGF.
 		preorder = space[3*n : 4*n]
-
 		prenum := lt.dfs(root, 0, preorder)
 
 		if prenum == int32(len(preorder)) {
@@ -443,12 +434,6 @@ func buildPostdomTree(f *Function) {
 			}
 		}
 	}
-
-	/* No recover business
-	recover := f.Recover
-	if recover != nil {
-		lt.dfs(recover, prenum, preorder)
-	} */
 
 	buckets := space[4*n : 5*n]
 	copy(buckets, preorder)
@@ -514,10 +499,6 @@ func buildPostdomTree(f *Function) {
 	}
 
 	numberPostdomTree(root, 0, 0)
-	/* TODO
-	if recover != nil {
-		numberPostdomTree(recover, pre, post)
-	} */
 
 	// Final Hackery
 	// 1. Set ipdom of all nodes that have root as thier ipdom as nil because root will not exist in reality
