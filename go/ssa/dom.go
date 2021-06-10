@@ -377,7 +377,6 @@ func buildPostdomTree(f *Function) {
 	root.Index = 0
 
 	if len(dummyExit.Preds) == 0 {
-		fmt.Printf("Cant build pdomtree for recover code in function %v", f)
 		return
 	}
 
