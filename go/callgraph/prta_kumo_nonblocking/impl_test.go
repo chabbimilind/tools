@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	rtalib "golang.org/x/tools/go/callgraph/rtalib"
-	"golang.org/x/tools/go/callgraph/rtalib/rtatest"
-	"golang.org/x/tools/go/callgraph/rtalib/utils"
+	rtalib "golang.org/x/tools/go/callgraph/internal/rtautil"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/rtatest"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/utils"
 	"golang.org/x/tools/go/types/typeutil"
 )
 

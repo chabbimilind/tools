@@ -15,7 +15,7 @@
 #   -output DIR     Output directory for per-target logs.
 #                   Default: /tmp/oss_rta_stats_$(date +%Y%m%d_%H%M%S)
 #   -flavors LIST   Comma-separated RTA flavors.
-#                   Default: srta,srta_opt,srta_struct,srta_kumo,srta_kumo_random,prta_kumo_nonblocking
+#                   Default: srta,srta_baseline,srta_kumo,srta_kumo_random,prta_kumo_nonblocking
 #   -workers LIST   Comma-separated worker counts.
 #                   Default: 1,2,4,8,16,32,64
 #   -timeout SEC    Per-target timeout (passed to `timeout` cmd). Default: 5400
@@ -45,7 +45,7 @@ unset GOFLAGS GOPACKAGESDRIVER GOPACKAGESDRIVER_ULSP_MODE 2>/dev/null || true
 TARGETS_FILE="${SCRIPT_DIR}/targets.csv"
 DATASETS_DIR="${SCRIPT_DIR}/datasets"
 OUTPUT_DIR=""
-FLAVORS="srta,srta_opt,srta_struct,srta_kumo,srta_kumo_random,prta_kumo_nonblocking"
+FLAVORS="srta,srta_baseline,srta_kumo,srta_kumo_random,prta_kumo_nonblocking"
 WORKERS="1,2,4,8,16,32,64"
 TIMEOUT=5400
 BINARY=""

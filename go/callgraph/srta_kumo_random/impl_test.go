@@ -3,7 +3,7 @@ package srta_kumo_random
 import (
 	"testing"
 
-	"golang.org/x/tools/go/callgraph/rtalib/rtatest"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/rtatest"
 )
 
 func TestCorrectness(t *testing.T) {

@@ -1,23 +1,23 @@
-// Package srta_struct is a sequential RTA built on top of [srta_opt]'s
-// original lineage (memoized method-value lookup via [utils.LookupMethodSeq]
-// + [utils.MethodValueFast]) plus one targeted set-value change: presence-only
+// Package srta_baseline is a sequential RTA built on a memoized
+// method-value lookup lineage (via [utils.LookupMethodSeq] +
+// [utils.MethodValueFast]) plus one targeted set-value change: presence-only
 // sets that were `map[K]bool` are now `map[K]struct{}`.
 //
 // Deliberately excludes the per-method invoke-site indexing (sitesByMethod)
-// that [srta_opt] / [srta_kumo] later layered on. Kept as a separate flavor
-// so we can isolate and benchmark the contribution of just the set-value
-// change relative to the LookupMethod-memoized baseline, holding the
-// invoke-site handling at the simple per-interface flat list of [srta].
-package srta_struct
+// that [srta_kumo] later layered on. Kept as a separate flavor so we can
+// isolate and benchmark the contribution of just the set-value change
+// relative to the LookupMethod-memoized baseline, holding the invoke-site
+// handling at the simple per-interface flat list of [srta].
+package srta_baseline
 
 import (
 	"fmt"
 	"go/types"
 
 	"golang.org/x/tools/go/callgraph"
+	rtalib "golang.org/x/tools/go/callgraph/internal/rtautil"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/utils"
 	rtapkg "golang.org/x/tools/go/callgraph/rta"
-	rtalib "golang.org/x/tools/go/callgraph/rtalib"
-	"golang.org/x/tools/go/callgraph/rtalib/utils"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/types/typeutil"
 )

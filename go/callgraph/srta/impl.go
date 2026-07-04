@@ -10,9 +10,9 @@ import (
 	"go/types"
 
 	"golang.org/x/tools/go/callgraph"
+	rtalib "golang.org/x/tools/go/callgraph/internal/rtautil"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/utils"
 	rtapkg "golang.org/x/tools/go/callgraph/rta"
-	rtalib "golang.org/x/tools/go/callgraph/rtalib"
-	"golang.org/x/tools/go/callgraph/rtalib/utils"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/types/typeutil"
 )

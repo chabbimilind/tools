@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"golang.org/x/tools/go/callgraph"
+	rta "golang.org/x/tools/go/callgraph/internal/rtautil"
 	rtapkg "golang.org/x/tools/go/callgraph/rta"
-	rta "golang.org/x/tools/go/callgraph/rtalib"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"

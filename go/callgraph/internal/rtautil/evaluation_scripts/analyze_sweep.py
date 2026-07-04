@@ -156,7 +156,7 @@ def report_speedup_over_srta(targets):
     print(f"# baseline: rta_duration_secs_{FLAVOR_BASELINE}_1_workers")
     print("# speedup_X = baseline_duration / X_duration  (higher = faster than srta)")
     print()
-    flavors = ["srta_opt", "srta_kumo", "prta_kumo_nonblocking@1", "prta_kumo_nonblocking@8", "prta_kumo_nonblocking@32", "prta_kumo_nonblocking@64"]
+    flavors = ["srta_kumo", "prta_kumo_nonblocking@1", "prta_kumo_nonblocking@8", "prta_kumo_nonblocking@32", "prta_kumo_nonblocking@64"]
     header = f"{'target':30}  {'srta(s)':>9}  " + "  ".join(f"{f:>22}" for f in flavors)
     print(header)
     print("-" * len(header))
@@ -196,7 +196,7 @@ def report_memory_overhead(targets):
     print("# metric: rta_peak_heap_delta_mb_<flavor>_<workers>")
     print("# overhead_X = X_peak_mb / srta_peak_mb")
     print()
-    flavors = ["srta_opt", "srta_kumo", "prta_kumo_nonblocking@1", "prta_kumo_nonblocking@8", "prta_kumo_nonblocking@32", "prta_kumo_nonblocking@64"]
+    flavors = ["srta_kumo", "prta_kumo_nonblocking@1", "prta_kumo_nonblocking@8", "prta_kumo_nonblocking@32", "prta_kumo_nonblocking@64"]
     header = f"{'target':30}  {'srta(MB)':>10}  " + "  ".join(f"{f:>22}" for f in flavors)
     print(header)
     print("-" * len(header))

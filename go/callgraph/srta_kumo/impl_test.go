@@ -3,8 +3,8 @@ package srta_kumo
 import (
 	"testing"
 
-	rtalib "golang.org/x/tools/go/callgraph/rtalib"
-	"golang.org/x/tools/go/callgraph/rtalib/rtatest"
+	rtalib "golang.org/x/tools/go/callgraph/internal/rtautil"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/rtatest"
 )
 
 func TestCorrectness(t *testing.T) {

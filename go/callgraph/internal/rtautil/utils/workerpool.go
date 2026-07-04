@@ -8,7 +8,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"golang.org/x/tools/go/callgraph/rtalib/chaselev"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/chaselev"
 )
 
 // WorkerPool is a fan-out worker pool with per-worker Chase-Lev work-stealing

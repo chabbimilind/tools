@@ -1,7 +1,7 @@
 package srta_kumo_random
 
 import (
-	rtalib "golang.org/x/tools/go/callgraph/rtalib"
+	rtalib "golang.org/x/tools/go/callgraph/internal/rtautil"
 	"golang.org/x/tools/go/callgraph/srta_kumo"
 	"golang.org/x/tools/go/ssa"
 )

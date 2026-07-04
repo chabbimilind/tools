@@ -4,8 +4,8 @@ import (
 	"sort"
 
 	"golang.org/x/tools/go/callgraph"
+	"golang.org/x/tools/go/callgraph/internal/rtautil/utils"
 	rtapkg "golang.org/x/tools/go/callgraph/rta"
-	"golang.org/x/tools/go/callgraph/rtalib/utils"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/types/typeutil"
 )

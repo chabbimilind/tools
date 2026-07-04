@@ -14,7 +14,7 @@ lines continue to work without change.
 service-registry JSON, the `src/code.uber.internal/...` package prefix, and
 RPC IDL discovery for inbound entrypoints. None of that exists for a GitHub
 checkout. Rather than mock all of those layers (a large lift), this harness
-imports the 8 flavor packages directly and drives them via
+imports the 5 flavor packages directly and drives them via
 `golang.org/x/tools/go/packages` + SSA — the same pattern the older
 `~/prta_oss/kumo` harness used. `rpcshield` itself is unchanged.
 
@@ -106,12 +106,9 @@ Columns:
 | flavor | type |
 | --- | --- |
 | `srta` | sequential |
-| `srta_opt` | sequential |
+| `srta_baseline` | sequential |
 | `srta_kumo` | sequential |
 | `srta_kumo_random` | sequential (ablation) |
-| `prta_naive` | parallel |
-| `prta_nonblocking` | parallel |
-| `prta_kumo` | parallel |
 | `prta_kumo_nonblocking` | parallel |
 
 Sequential flavors ignore the `-workers` list and always run with `1` worker

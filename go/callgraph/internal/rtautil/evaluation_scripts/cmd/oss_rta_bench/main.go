@@ -28,22 +28,18 @@ import (
 	"syscall"
 	"time"
 
-	"golang.org/x/tools/go/callgraph/prta_kumo"
+	rta "golang.org/x/tools/go/callgraph/internal/rtautil"
 	"golang.org/x/tools/go/callgraph/prta_kumo_nonblocking"
-	"golang.org/x/tools/go/callgraph/prta_naive"
-	"golang.org/x/tools/go/callgraph/prta_nonblocking"
-	rta "golang.org/x/tools/go/callgraph/rtalib"
 	"golang.org/x/tools/go/callgraph/srta"
+	"golang.org/x/tools/go/callgraph/srta_baseline"
 	"golang.org/x/tools/go/callgraph/srta_kumo"
 	"golang.org/x/tools/go/callgraph/srta_kumo_random"
-	"golang.org/x/tools/go/callgraph/srta_opt"
-	"golang.org/x/tools/go/callgraph/srta_struct"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
 )
 
-// flavorEntry registers one of the 8 RTA flavor implementations.
+// flavorEntry registers one of the 5 RTA flavor implementations.
 // sequential flavors collapse the worker list to {1} per rtaeval.go's
 // runSingleFlavor contract.
 type flavorEntry struct {
@@ -54,13 +50,9 @@ type flavorEntry struct {
 
 var flavorRegistry = []flavorEntry{
 	{"srta", true, func() rta.RTA { return srta.New() }},
-	{"srta_opt", true, func() rta.RTA { return srta_opt.New() }},
-	{"srta_struct", true, func() rta.RTA { return srta_struct.New() }},
+	{"srta_baseline", true, func() rta.RTA { return srta_baseline.New() }},
 	{"srta_kumo", true, func() rta.RTA { return srta_kumo.New() }},
 	{"srta_kumo_random", true, func() rta.RTA { return srta_kumo_random.New() }},
-	{"prta_naive", false, func() rta.RTA { return prta_naive.New() }},
-	{"prta_nonblocking", false, func() rta.RTA { return prta_nonblocking.New() }},
-	{"prta_kumo", false, func() rta.RTA { return prta_kumo.New() }},
 	{"prta_kumo_nonblocking", false, func() rta.RTA { return prta_kumo_nonblocking.New() }},
 }
 
@@ -135,7 +127,7 @@ func main() {
 		targetName  = flag.String("target-name", "", "label for this target (used only in log messages)")
 		targetDir   = flag.String("target-dir", "", "subdir of -dataset-root containing the project's go.mod (e.g., kubernetes, etcd/server)")
 		targetPkg   = flag.String("target-pkg", ".", "package path relative to target-dir to analyze (e.g., ./cmd/kubelet)")
-		flavorsCSV  = flag.String("flavors", "srta,srta_opt,srta_struct,srta_kumo,srta_kumo_random,prta_kumo_nonblocking", "comma-separated RTA flavors")
+		flavorsCSV  = flag.String("flavors", "srta,srta_baseline,srta_kumo,srta_kumo_random,prta_kumo_nonblocking", "comma-separated RTA flavors")
 		workersCSV  = flag.String("workers", "1,2,4,8,16,32,64", "comma-separated worker counts (sequential flavors collapse to 1)")
 		buildCG     = flag.Bool("build-cg", true, "whether each Analyze call builds the call graph")
 	)
