@@ -9,6 +9,7 @@ package ssa
 import (
 	"fmt"
 	"go/types"
+	"sync"
 
 	"golang.org/x/tools/go/types/typeutil"
 	"golang.org/x/tools/internal/typesinternal"
@@ -22,7 +23,11 @@ import (
 //
 // Thread-safe.
 //
-// Acquires prog.methodsMu.
+// Acquires prog.methodsMu briefly to look up or create the per-T *methodSet,
+// then a per-(*methodSet) sync.Mutex for the actual method mapping. The cold
+// compute (createWrapper / objectMethod) runs under the per-T lock only,
+// eliminating the previous global-mutex bottleneck where every worker that
+// reached MethodValue serialized behind every other worker's wrapper synthesis.
 func (prog *Program) MethodValue(sel *types.Selection) *Function {
 	if sel.Kind() != types.MethodVal {
 		panic(fmt.Sprintf("MethodValue(%s) kind != MethodVal", sel))
@@ -42,45 +47,50 @@ func (prog *Program) MethodValue(sel *types.Selection) *Function {
 
 	var b builder
 
-	m := func() *Function {
-		prog.methodsMu.Lock()
-		defer prog.methodsMu.Unlock()
+	// Step 1: get or create the *methodSet for T. Hold prog.methodsMu only
+	// for the brief typeutil.Map probe — never for the cold compute below.
+	prog.methodsMu.Lock()
+	mset, ok := prog.methodSets.At(T).(*methodSet)
+	if !ok {
+		mset = &methodSet{mapping: make(map[string]*Function)}
+		prog.methodSets.Set(T, mset)
+	}
+	prog.methodsMu.Unlock()
 
-		// Get or create SSA method set.
-		mset, ok := prog.methodSets.At(T).(*methodSet)
-		if !ok {
-			mset = &methodSet{mapping: make(map[string]*Function)}
-			prog.methodSets.Set(T, mset)
-		}
-
-		// Get or create SSA method.
-		id := sel.Obj().Id()
-		fn, ok := mset.mapping[id]
-		if !ok {
-			obj := sel.Obj().(*types.Func)
-			needsPromotion := len(sel.Index()) > 1
-			needsIndirection := !isPointer(recvType(obj)) && isPointer(T)
-			if needsPromotion || needsIndirection {
-				fn = createWrapper(prog, toSelection(sel), nil)
-				fn.buildshared = b.shared()
-				b.enqueue(fn)
-			} else {
-				fn = prog.objectMethod(obj, nil, &b)
-			}
-			if fn.Signature.Recv() == nil {
-				panic(fn)
-			}
-			mset.mapping[id] = fn
+	// Step 2: per-T lock guards mset.mapping and serializes wrapper synthesis
+	// only for callers that share the same receiver type. Different Ts proceed
+	// in parallel.
+	mset.mu.Lock()
+	id := sel.Obj().Id()
+	fn, exists := mset.mapping[id]
+	if !exists {
+		obj := sel.Obj().(*types.Func)
+		needsPromotion := len(sel.Index()) > 1
+		needsIndirection := !isPointer(recvType(obj)) && isPointer(T)
+		if needsPromotion || needsIndirection {
+			fn = createWrapper(prog, toSelection(sel), nil)
+			fn.buildshared = b.shared()
+			b.enqueue(fn)
 		} else {
-			b.waitForSharedFunction(fn)
+			fn = prog.objectMethod(obj, nil, &b)
 		}
+		if fn.Signature.Recv() == nil {
+			panic(fn)
+		}
+		mset.mapping[id] = fn
+	}
+	mset.mu.Unlock()
 
-		return fn
-	}()
+	// waitForSharedFunction must run outside the per-T lock: it just records
+	// a task-graph edge into the local builder, but holding the lock across
+	// it would re-introduce the serialization we are eliminating.
+	if exists {
+		b.waitForSharedFunction(fn)
+	}
 
 	b.iterate()
 
-	return m
+	return fn
 }
 
 // objectMethod returns the Function for a given method symbol.
@@ -140,6 +150,7 @@ func (prog *Program) LookupMethod(T types.Type, pkg *types.Package, name string)
 
 // methodSet contains the (concrete) methods of a concrete type (non-interface, non-parameterized).
 type methodSet struct {
+	mu      sync.Mutex           // guards mapping
 	mapping map[string]*Function // populated lazily
 }
 
